@@ -1,0 +1,147 @@
+{
+  "n_scenarios": 10,
+  "duration_s": 30,
+  "sampling_rate": 512,
+  "scenarios": [
+    {
+      "id": "heart_attack",
+      "label": "Heart Attack",
+      "color": "#FF0000",
+      "color_secondary": "#000000",
+      "flashing": true,
+      "expected": {
+        "hr_bpm": "ignored",
+        "hrv_ms": "ignored",
+        "amplitude": "erratic"
+      },
+      "physiological_why": "Medical anomaly thresholds. Overrides all other classifications.",
+      "file": "heart_attack.npz"
+    },
+    {
+      "id": "anger",
+      "label": "Anger",
+      "color": "#FF0000",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": ">85",
+        "hrv_ms": "<30",
+        "amplitude": "high"
+      },
+      "physiological_why": "High energy, high stress, strong pounding chest.",
+      "file": "anger.npz"
+    },
+    {
+      "id": "anxiety",
+      "label": "Anxiety",
+      "color": "#FF8C00",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": ">85",
+        "hrv_ms": "<30",
+        "amplitude": "low/noisy"
+      },
+      "physiological_why": "Fast heart rate, high stress, but shallow breathing/trembling.",
+      "file": "anxiety.npz"
+    },
+    {
+      "id": "fear",
+      "label": "Fear",
+      "color": "#8A2BE2",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": ">85",
+        "hrv_ms": ">=30",
+        "amplitude": "any"
+      },
+      "physiological_why": "Fight-or-flight triggered. Fast HR, but heart compensates well (HRV stays normal).",
+      "file": "fear.npz"
+    },
+    {
+      "id": "joy",
+      "label": "Joy",
+      "color": "#FFD700",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "65-85",
+        "hrv_ms": ">50",
+        "amplitude": "any"
+      },
+      "physiological_why": "Resting heart rate, but highly relaxed/positive variance.",
+      "file": "joy.npz"
+    },
+    {
+      "id": "envy",
+      "label": "Envy",
+      "color": "#00CED1",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "65-85",
+        "hrv_ms": "30-50",
+        "amplitude": "any"
+      },
+      "physiological_why": "The baseline. Awake, alert, but neutral vitals.",
+      "file": "envy.npz"
+    },
+    {
+      "id": "disgust",
+      "label": "Disgust",
+      "color": "#32CD32",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "65-85",
+        "hrv_ms": "<30",
+        "amplitude": "high/norm"
+      },
+      "physiological_why": "Unpleasant stimulus causing mild stress, but not enough to spike HR. Strong physical rejection reaction.",
+      "file": "disgust.npz"
+    },
+    {
+      "id": "embarrassment",
+      "label": "Embarrassment",
+      "color": "#FF69B4",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "65-85",
+        "hrv_ms": "<30",
+        "amplitude": "low"
+      },
+      "physiological_why": "Mild stress, body physically 'withdraws' (shallow breathing/low amplitude).",
+      "file": "embarrassment.npz"
+    },
+    {
+      "id": "ennui",
+      "label": "Ennui",
+      "color": "#3A3B5C",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "<65",
+        "hrv_ms": ">50",
+        "amplitude": "any"
+      },
+      "physiological_why": "Extremely relaxed, almost asleep. Low energy.",
+      "file": "ennui.npz"
+    },
+    {
+      "id": "sadness",
+      "label": "Sadness",
+      "color": "#4169E1",
+      "color_secondary": null,
+      "flashing": false,
+      "expected": {
+        "hr_bpm": "<65",
+        "hrv_ms": "<=50",
+        "amplitude": "any"
+      },
+      "physiological_why": "Low energy, but accompanied by withdrawal/stress (low variability).",
+      "file": "sadness.npz"
+    }
+  ]
+}

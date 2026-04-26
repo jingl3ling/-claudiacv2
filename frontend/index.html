@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claudiac — Heart Demo</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="card" aria-label="Live heart">
+        <div class="top">
+          <div class="brand">
+            <div class="dot" aria-hidden="true"></div>
+            <div class="brandText">
+              <div class="title">Claudiac</div>
+              <div class="subtitle">ECG-based emotion &amp; cardiac anomaly classifier</div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <label class="field">
+              <span>Backend</span>
+              <input id="baseUrl" value="http://localhost:5000" autocomplete="off" spellcheck="false" />
+            </label>
+            <label class="field">
+              <span>ECG source</span>
+              <select id="ecgSource">
+                <option value="demo">Demo ECG</option>
+                <option value="upload">iOS upload (device)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Device ID</span>
+              <input id="deviceId" value="ios-001" autocomplete="off" spellcheck="false" />
+            </label>
+            <button id="connectBtn" class="btn" type="button">Connect</button>
+          </div>
+        </div>
+
+        <div class="center">
+          <!-- Left column: heart + classification + explanation -->
+          <div class="leftCol">
+            <div class="heartWrap">
+              <div id="glow" class="glow" aria-hidden="true"></div>
+              <svg
+                id="heart"
+                class="heart"
+                viewBox="0 0 256 256"
+                role="img"
+                aria-label="Heart"
+                focusable="false"
+              >
+                <defs>
+                  <linearGradient id="hgFill" x1="0" y1="0" x2="1" y2="1">
+                    <stop id="hgStop0" offset="0" stop-color="#ff9ad1" />
+                    <stop id="hgStop1" offset="0.45" stop-color="#ff2d55" />
+                    <stop id="hgStop2" offset="1" stop-color="#7c2cff" />
+                  </linearGradient>
+                  <linearGradient id="hgChrome" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="rgba(255,255,255,0.95)" />
+                    <stop offset="0.25" stop-color="rgba(255,255,255,0.25)" />
+                    <stop offset="0.55" stop-color="rgba(255,255,255,0.9)" />
+                    <stop offset="1" stop-color="rgba(255,255,255,0.15)" />
+                  </linearGradient>
+                  <filter id="hgSoftGlow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feColorMatrix
+                      in="blur"
+                      type="matrix"
+                      values="
+                        1 0 0 0 0
+                        0 0.4 0 0 0
+                        0 0 1 0 0
+                        0 0 0 0.85 0"
+                      result="tint"
+                    />
+                    <feMerge>
+                      <feMergeNode in="tint" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <path
+                  class="heartFill"
+                  d="M128 226s-74-44.6-101.2-86.6C8.6 110.5 13.5 72 44 50.8c25-17.4 57.8-10.6 75.9 11.6 18.1-22.2 50.9-29 75.9-11.6 30.5 21.2 35.4 59.7 17.2 88.6C202 181.4 128 226 128 226z"
+                  fill="url(#hgFill)"
+                  filter="url(#hgSoftGlow)"
+                />
+                <path
+                  class="heartStroke"
+                  d="M128 226s-74-44.6-101.2-86.6C8.6 110.5 13.5 72 44 50.8c25-17.4 57.8-10.6 75.9 11.6 18.1-22.2 50.9-29 75.9-11.6 30.5 21.2 35.4 59.7 17.2 88.6C202 181.4 128 226 128 226z"
+                  fill="none"
+                  stroke="url(#hgChrome)"
+                  stroke-width="6"
+                  stroke-linejoin="round"
+                  opacity="0.75"
+                />
+                <path
+                  class="heartShine"
+                  d="M62 82c12-19 36-31 58-21 7 3 12 8 16 13-18-11-42-7-56 8-8 8-13 18-16 30-5-11-6-21-2-30z"
+                  fill="rgba(255,255,255,0.35)"
+                />
+                <g class="sparkles" fill="rgba(255,255,255,0.55)">
+                  <path d="M194 64l6 10 10 6-10 6-6 10-6-10-10-6 10-6z" />
+                  <path d="M196 132l4 7 7 4-7 4-4 7-4-7-7-4 7-4z" opacity="0.75" />
+                  <path d="M64 148l4 7 7 4-7 4-4 7-4-7-7-4 7-4z" opacity="0.65" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- Classification card (new) -->
+            <div id="classCard" class="classCard" hidden>
+              <div class="classTop">
+                <span class="classKicker">CLASSIFICATION</span>
+                <span id="classLabel" class="classLabel">—</span>
+              </div>
+              <div id="classFeatures" class="classFeatures"></div>
+              <div id="classRules" class="classRules"></div>
+            </div>
+
+            <!-- Claude explanation card (new) -->
+            <div id="explCard" class="explCard" hidden>
+              <div class="explKicker">CLAUDE EXPLANATION</div>
+              <div id="explText" class="explText">—</div>
+              <div class="explFooter">
+                source: <span id="explSource">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: BPM + chips + buttons + waveform -->
+          <div class="metrics">
+            <div class="bpm">
+              <div class="label">Heart rate</div>
+              <div class="value">
+                <span id="bpmValue">—</span>
+                <span class="unit">BPM</span>
+              </div>
+            </div>
+
+            <div class="meta">
+              <div class="chip">
+                <span class="chipLabel">Status</span>
+                <span id="statusText" class="chipValue">disconnected</span>
+              </div>
+              <div class="chip">
+                <span class="chipLabel">Source</span>
+                <span id="sourceText" class="chipValue">—</span>
+              </div>
+            </div>
+
+            <div class="demo">
+              <div class="demoTitle">Scenarios</div>
+              <div id="demoButtons" class="demoGrid" aria-label="Scenario buttons"></div>
+              <div class="demoHint">Click a scenario to load that ECG and run the classification pipeline.</div>
+            </div>
+
+            <div class="wave">
+              <div class="waveTop">
+                <div class="waveTitle">ECG Waveform</div>
+                <button id="waveRefreshBtn" class="btn btnSmall" type="button">Refresh</button>
+              </div>
+              <canvas id="waveCanvas" width="760" height="170" aria-label="ECG waveform"></canvas>
+              <div class="waveMeta">
+                <span class="chipLabel">Source</span>
+                <span id="waveSourceText" class="chipValue">/api/waveform</span>
+                <span class="chipLabel">•</span>
+                <span id="waveInfoText" class="chipValue">—</span>
+              </div>
+            </div>
+
+            <div id="errorBox" class="error" hidden></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
