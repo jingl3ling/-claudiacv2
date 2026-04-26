@@ -229,50 +229,18 @@ function renderClassification(payload) {
   }
 }
 
-// ----------------------------------------------------------------------
-// TTS — speak Claude's explanation when it appears
-// ----------------------------------------------------------------------
-let lastSpokenText = "";  // dedupe so polling doesn't re-speak the same thing
-
-function speakText(text) {
-  if (!text || !("speechSynthesis" in window)) return;
-  if (text === lastSpokenText) return;     // already speaking this exact text
-  lastSpokenText = text;
-
-  // Cancel any in-progress speech so the new one wins
-  window.speechSynthesis.cancel();
-
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 1.0;
-  utter.pitch = 1.0;
-  utter.volume = 1.0;
-  // Default voice — let the browser pick (usually system default).
-  window.speechSynthesis.speak(utter);
-}
-
-function renderExplanation(payload, options) {
+function renderExplanation(payload) {
   if (!payload) return;
   const expl = payload.explanation;
   if (!expl) return;
   explCardEl.hidden = false;
   explTextEl.textContent = expl.text || "";
   explSourceEl.textContent = expl.source || "";
-
-  // Only speak if explicitly requested (e.g. when a scenario was just
-  // selected). Polling refreshes do NOT speak — otherwise every poll
-  // tick that returns a slightly different Claude response would
-  // interrupt the previous TTS.
-  if (options && options.speak && expl.text) {
-    speakText(expl.text);
-  }
 }
 function setExplanationLoading(label) {
   explCardEl.hidden = false;
   explTextEl.textContent = label || "🤖 Reasoning…";
   explSourceEl.textContent = "";
-  // Cancel any pending TTS while we wait for new explanation
-  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-  lastSpokenText = "";  // allow speaking next explanation even if same text
 }
 
 // ----------------------------------------------------------------------
@@ -427,7 +395,7 @@ async function selectScenario(emo) {
     }
 
     renderClassification(data);
-    renderExplanation(data, { speak: true });   // user clicked -> speak
+    renderExplanation(data);
     renderDataSourceBadge(emo.key, data.data_source, data.fallback_reason);
 
     if (data?.ecg && Array.isArray(data.ecg.samples_uV)) {
